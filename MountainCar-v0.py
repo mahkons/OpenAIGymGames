@@ -3,18 +3,22 @@ import math
 
 env = gym.make('MountainCar-v0')
 
-INIT_STEPS = 4
-SMALL_VELOCITY = 0.002
+SMALL_INIT_POS_RIGHT = 0.040
+SMALL_INIT_POS_LEFT = -0.030
 
+INIT_STEPS_COMMON = 4
+INIT_STEPS_SMALL_POS = 13
+
+SMALL_VELOCITY = 0.002
 QUITE_RIGHT = 0.05 * 2
 NEAR_FINISH = 0.05 * 14
 NOT_FAST = 0.018
 
-def choose_action(observation, count, prev_action):
+def choose_action(observation, count, prev_action, init_steps):
     position, velocity = observation
     abs_pos = position + math.pi / 6;
 
-    if count < INIT_STEPS:
+    if count < init_steps:
         return prev_action
 
     action = 0 if abs(abs_pos) > 0 else 2
@@ -31,11 +35,19 @@ def play(env, render=False):
     observation = env.reset()
     result = 0
     
-    action = 0 if (observation[0] + math.pi / 6) > 0 else 2
+    abs_pos = (observation[0] + math.pi / 6)
+
+    if SMALL_INIT_POS_RIGHT < abs_pos or abs_pos < SMALL_INIT_POS_LEFT:
+        action = 0 if abs_pos > 0 else 2
+        init_steps = INIT_STEPS_COMMON
+    else:
+        action = 2
+        init_steps = INIT_STEPS_SMALL_POS
+
     for count in range(200):
         if render:
             env.render()
-        action = choose_action(observation, count, action)
+        action = choose_action(observation, count, action, init_steps)
         observation, reward, done, info = env.step(action)
         result += reward
         if done:
