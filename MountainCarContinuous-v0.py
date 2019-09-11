@@ -19,17 +19,20 @@ NOT_FAST = 0.020
 REALLY_FAST_LEFT = -0.035
 REALLY_FAST_RIGHT = 0.045
 
+
 def choose_action(observation, count, prev_action, init_steps):
     position, velocity = observation
-    abs_pos = position + math.pi / 6;
+    abs_pos = position + math.pi / 6
 
     if count < init_steps:
         return prev_action
 
-    # slow down before finish 
-    if (abs_pos < 0 and abs(velocity > 0.05)):
+    # slow down before finish
+    if abs_pos < 0 and abs(velocity) > 0.05:
         return 0
-    if (abs_pos > 0.6 and velocity > 0.03) or (abs_pos > 0.7 and velocity > 0.02) or (abs_pos > 0.8 and velocity > 0.005):
+    if (abs_pos > 0.6 and velocity > 0.03) \
+    or (abs_pos > 0.7 and velocity > 0.02) \
+    or (abs_pos > 0.8 and velocity > 0.005):
         return 0
 
     action = -COMMON_SPEED if abs(abs_pos) > 0 else COMMON_SPEED
@@ -45,19 +48,22 @@ def choose_action(observation, count, prev_action, init_steps):
     return -COMMON_SPEED if velocity < 0 else COMMON_SPEED
 
 
-def play(env, render=False):
-    observation = env.reset()
-    result = 0
-    
+def init(observation):
     abs_pos = (observation[0] + math.pi / 6)
-
     if SMALL_INIT_POS_RIGHT < abs_pos or abs_pos < SMALL_INIT_POS_LEFT:
         action = -INIT_SPEED if abs_pos > 0 else INIT_SPEED
         init_steps = INIT_STEPS_COMMON
     else:
         action = INIT_SPEED
         init_steps = INIT_STEPS_SMALL_POS
+    return action, init_steps
 
+
+def play(env, render=False):
+    result = 0
+    observation = env.reset()
+
+    action, init_steps = init(observation)
     for count in range(200):
         if render:
             env.render()
@@ -67,12 +73,12 @@ def play(env, render=False):
         if done:
             break
     return result
-    
 
-for i_epi in range(20):
+
+for i_epi in range(0):
     print(play(env, True))
 
-magic = 10000
+magic = 100000
 result = sum([play(env) for _ in range(magic)]) / magic
 print(result)
 
