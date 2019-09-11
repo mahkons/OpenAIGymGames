@@ -56,7 +56,7 @@ def play(env, render=False):
         if done:
             break
     return result
- 
+
 
 for i_epi in range(0):
     print(play(env, True))

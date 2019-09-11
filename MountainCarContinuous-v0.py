@@ -31,8 +31,8 @@ def choose_action(observation, count, prev_action, init_steps):
     if abs_pos < 0 and abs(velocity) > 0.05:
         return 0
     if (abs_pos > 0.6 and velocity > 0.03) \
-    or (abs_pos > 0.7 and velocity > 0.02) \
-    or (abs_pos > 0.8 and velocity > 0.005):
+            or (abs_pos > 0.7 and velocity > 0.02) \
+            or (abs_pos > 0.8 and velocity > 0.005):
         return 0
 
     action = -COMMON_SPEED if abs(abs_pos) > 0 else COMMON_SPEED
